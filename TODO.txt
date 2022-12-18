@@ -1,0 +1,3 @@
+
+cool down de l'attaque
+vérifier que une fois l'animation de hit, attaque, death soient fini, ne reboucle passed (selon tout les fps)
