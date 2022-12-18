@@ -50,16 +50,19 @@ window.onload = function() {
     var startTimer = 3;
     var fightTimer = 60;
 
-    const background = new Sprite({canvas, context}, {
+    const background = new Sprite('background', {canvas, context}, {
         position: {x: 0, y: 0 },
-        imageSrc: './assets/img/background.png'
+        imageSrc: './assets/img/background.png',
+        framesMax: 1,
+        framesCycle: 1
     });
 
-    const shop = new Sprite({canvas, context}, {
+    const shop = new Sprite('shop', {canvas, context}, {
         position: {x: 600, y: 128 },
         imageSrc: './assets/img/shop.png',
         scale: 2.75,
-        framesMax: 6
+        framesMax: 6,
+        framesCycle: 2
     });
 
     var intervalCleared = false;
@@ -103,7 +106,7 @@ window.onload = function() {
         fpsDisplay.textContent = Math.round(fps) + ' FPS';
     }
 
-    const player1 = new Player({canvas, context}, keys, {
+    const player1 = new Player('player1', {canvas, context}, keys, {
         position: {x: 50, y: 100},
         controls: {left: "q", right: "d"},
         scale: 2.5,
@@ -112,35 +115,42 @@ window.onload = function() {
             idle: {
                 imageSrc: './assets/img/samuraiMack/Idle.png',
                 framesMax: 8,
+                framesCycle: 1
             },
             run: {
                 imageSrc: './assets/img/samuraiMack/Run.png',
                 framesMax: 8,
+                framesCycle: 2
             },
             jump: {
                 imageSrc: './assets/img/samuraiMack/Jump.png',
                 framesMax: 2,
+                framesCycle: 1
             },
             fall: {
                 imageSrc: './assets/img/samuraiMack/Fall.png',
                 framesMax: 2,
+                framesCycle: 1
             },
             attack1: {
                 imageSrc: './assets/img/samuraiMack/Attack1.png',
                 framesMax: 6,
+                framesCycle: 1
             },
             takeHit: {
                 imageSrc: './assets/img/samuraiMack/Take Hit - white silhouette.png',
-                framesMax: 4
+                framesMax: 4,
+                framesCycle: 1
             },
             death: {
                 imageSrc: './assets/img/samuraiMack/Death.png',
-                framesMax: 6
+                framesMax: 6,
+                framesCycle: 1
             }
         }
     });
 
-    const player2 = new Player({canvas, context}, keys, {
+    const player2 = new Player('player2', {canvas, context}, keys, {
         position: {x: 924, y: 100},
         controls: {left: "k", right: "m"},
         scale: 2.5,
@@ -150,30 +160,37 @@ window.onload = function() {
             idle: {
                 imageSrc: './assets/img/Kenji/Idle.png',
                 framesMax: 4,
+                framesCycle: 2
             },
             run: {
                 imageSrc: './assets/img/Kenji/Run.png',
                 framesMax: 8,
+                framesCycle: 2
             },
             jump: {
                 imageSrc: './assets/img/Kenji/Jump.png',
                 framesMax: 2,
+                framesCycle: 1
             },
             fall: {
                 imageSrc: './assets/img/Kenji/Fall.png',
                 framesMax: 2,
+                framesCycle: 1
             },
             attack1: {
                 imageSrc: './assets/img/Kenji/Attack1.png',
                 framesMax: 4,
+                framesCycle: 1
             },
             takeHit: {
                 imageSrc: './assets/img/kenji/Take hit.png',
-                framesMax: 3
+                framesMax: 3,
+                framesCycle: 1
             },
             death: {
                 imageSrc: './assets/img/kenji/Death.png',
-                framesMax: 7
+                framesMax: 7,
+                framesCycle: 1
             }
         }
     });

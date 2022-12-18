@@ -1,16 +1,18 @@
 export default class Sprite {    
     constructor(
+        name = 'anonymous sprite',
         {canvas, context},
         {
             position,
             imageSrc,
             scale = 1,
             framesMax = 1,
-            framesCycle = 2,
+            framesCycle = 1,
             offSet = {x: 0, y: 0},
             mirrored = false
         }
     ) {
+        this.name = name;
         this.canvas = canvas;
         this.context = context;
         
@@ -23,6 +25,7 @@ export default class Sprite {
         this.offSet = offSet;
         
         this.framesMax = framesMax;
+        this.framesCycle = framesCycle;
         this.frameCurrent = 0;
         this.framesElapsed = 0;
         this.framesHold = 10;
@@ -33,11 +36,12 @@ export default class Sprite {
     }
 
     begin() {
-
+        //
     }
 
     update(lastSecondFPS) {
-        this.framesHold = lastSecondFPS / this.spriteFPS;
+        this.spriteFPS = this.framesMax * this.framesCycle
+        this.framesHold = Math.round(lastSecondFPS / this.spriteFPS);
     }
 
     draw(interp) {
@@ -62,8 +66,6 @@ export default class Sprite {
         this.context.restore();
 
         //this.showBoxes();
-
-        //this.animateFrame();
     }
 
     end() {

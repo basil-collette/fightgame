@@ -5,6 +5,7 @@ const gravity = 0.042; //0.7 without timestep sensitivity
 export default class Player extends Sprite {
 
     constructor(
+        name = 'anonymous player',
         {canvas, context}, keys,
         {
             position,
@@ -18,7 +19,7 @@ export default class Player extends Sprite {
             mirrored = false
         }
     ) {
-        super({canvas, context}, { position, imageSrc, scale, framesMax, framesMax, offSet, mirrored });
+        super(name, {canvas, context}, { position, imageSrc, scale, framesMax, framesMax, offSet, mirrored });
         
         this.keys = keys;
 
@@ -61,7 +62,11 @@ export default class Player extends Sprite {
         //showBoxes();
     }
 
-    update(timestep) {
+    update(lastSecondFPS) {
+        super.update(lastSecondFPS);
+        
+        const timestep = 1000 / lastSecondFPS;
+
         this.lastPosition = this.position;
 
         this.updateHorizontalPosition(timestep);
@@ -75,9 +80,9 @@ export default class Player extends Sprite {
     }
 
     updateVerticalPosition(timestep) {
-        this.position.y += this.velocity.y * timestep; //*timestep to be relativ to fps
+        this.position.y += this.velocity.y * timestep; // * timestep to be relativ to fps
 
-        if(this.isOnGround(this)) { //|| this.position.y + this.velocity.y < -20
+        if(this.isOnGround(this)) {
             this.velocity.y = 0;
             this.position.y = 330;
         } else {
@@ -114,7 +119,7 @@ export default class Player extends Sprite {
             if(!this.isAttacking) {
                 this.mirrored = false;
             }
-            
+
         } else {
             this.switchSprites('idle');
         }
@@ -159,6 +164,7 @@ export default class Player extends Sprite {
                 if(this.image !== this.sprites.idle.image) {
                     this.image = this.sprites.idle.image;
                     this.framesMax = this.sprites.idle.framesMax;
+                    this.framesCycle = this.sprites.idle.framesCycle;
                     this.frameCurrent = 0;
                 }
                 break;
@@ -166,6 +172,7 @@ export default class Player extends Sprite {
                 if(this.image !== this.sprites.run.image) {
                     this.image = this.sprites.run.image;
                     this.framesMax = this.sprites.run.framesMax;
+                    this.framesCycle = this.sprites.run.framesCycle;
                     this.frameCurrent = 0;
                 }
                 break;
@@ -173,6 +180,7 @@ export default class Player extends Sprite {
                 if(this.image !== this.sprites.jump.image) {
                     this.image = this.sprites.jump.image;
                     this.framesMax = this.sprites.jump.framesMax;
+                    this.framesCycle = this.sprites.jump.framesCycle;
                     this.frameCurrent = 0;
                 }
                 break;
@@ -180,6 +188,7 @@ export default class Player extends Sprite {
                 if(this.image !== this.sprites.fall.image) {
                     this.image = this.sprites.fall.image;
                     this.framesMax = this.sprites.fall.framesMax;
+                    this.framesCycle = this.sprites.fall.framesCycle;
                     this.frameCurrent = 0;
                 }
                 break;
@@ -187,6 +196,7 @@ export default class Player extends Sprite {
                 if(this.image !== this.sprites.attack1.image) {
                     this.image = this.sprites.attack1.image;
                     this.framesMax = this.sprites.attack1.framesMax;
+                    this.framesCycle = this.sprites.attack1.framesCycle;
                     this.frameCurrent = 0;
                 }
                 break;
@@ -194,6 +204,7 @@ export default class Player extends Sprite {
                 if (this.image !== this.sprites.takeHit.image) {
                     this.image = this.sprites.takeHit.image
                     this.framesMax = this.sprites.takeHit.framesMax
+                    this.framesCycle = this.sprites.takeHit.framesCycle;
                     this.frameCurrent = 0
                 }
                 break
@@ -201,6 +212,7 @@ export default class Player extends Sprite {
                 if (this.image !== this.sprites.death.image) {
                     this.image = this.sprites.death.image
                     this.framesMax = this.sprites.death.framesMax
+                    this.framesCycle = this.sprites.death.framesCycle;
                     this.frameCurrent = 0
                 }
                 break
@@ -226,13 +238,15 @@ export default class Player extends Sprite {
         super.showBoxes();
 
         //slash hitbox
-        this.context.fillStyle = 'red';
-        this.context.fillRect(
-            this.attackBox.position.x,
-            this.attackBox.position.y,
-            this.attackBox.width,
-            this.attackBox.height
-        );
+        if (this.isAttacking) {
+            this.context.fillStyle = 'red';
+            this.context.fillRect(
+                this.attackBox.position.x,
+                this.attackBox.position.y,
+                this.attackBox.width,
+                this.attackBox.height
+            );
+        }
     }
 
 }
@@ -311,7 +325,7 @@ export default class Player extends Sprite {
     }
 
     updateVerticalPosition(timestep) {
-        this.position.y += this.velocity.y * timestep; //*timestep to be relativ to fps
+        this.position.y += this.velocity.y * timestep; // * timestep to be relativ to fps
 
         if(this.isOnGround(this)) { //|| this.position.y + this.velocity.y < -20
             this.velocity.y = 0;
