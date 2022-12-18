@@ -1,0 +1,111 @@
+body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#gameArea {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    z-index: 100;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 100px;
+    padding-right: 100px;
+    gap: 45px;
+}
+
+.playerHealth {
+    position: relative;
+    width: 100%;
+    height: 30px;
+}
+
+#centralUI {
+    position: absolute;
+    z-index: 101;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 100%;
+    background-color: rgba(200, 200, 200, 1);
+}
+
+.playerHealth:nth-child(1) {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+
+.playerHealth:nth-child(3) {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+}
+
+.playerHealth:nth-child(1):before {
+    content:"";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 30px;
+    border-top: 30px solid rgba(0, 0, 0, 0.4);;
+    border-left: 30px solid transparent;
+}
+.playerHealth:nth-child(3):before {
+    content:"";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 30px;
+    border-bottom: 30px solid rgba(0, 0, 0, 0.4);;
+    border-right: 30px solid transparent;
+}
+
+#player1Health, #player2Health {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#player1Health {
+    position: relative;
+    overflow: hidden;
+    justify-content: start;
+    border-top: 30px solid #ef4444;
+    border-left: 30px solid transparent;
+}
+/*
+#player1Health:after {
+    content:"";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 30px;
+    border-image: linear-gradient(to right, darkblue, darkorchid) 1;
+}
+*/
+#player2Health {
+    position: relative;
+    justify-content: end;
+    border-bottom: 30px solid #2563eb;
+    border-right: 30px solid transparent;
+}
+/*
+#player2Health:after {
+    content:"";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 30px;
+    border-image: linear-gradient(to right, red, darkorchid) 1;
+}
+*/
