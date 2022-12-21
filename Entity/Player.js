@@ -6,7 +6,7 @@ export default class Player extends Sprite {
 
     constructor(
         name = 'anonymous player',
-        {canvas, context}, keys,
+        {canvas, context, domHealthBar}, keys,
         {
             position,
             controls,
@@ -21,6 +21,7 @@ export default class Player extends Sprite {
     ) {
         super(name, {canvas, context}, { position, imageSrc, scale, framesMax, framesMax, offSet, mirrored });
         
+        this.domHealthBar = domHealthBar;
         this.keys = keys;
 
         this.velocity = {x: 0, y: 0};

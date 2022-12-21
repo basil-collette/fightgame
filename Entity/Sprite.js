@@ -41,7 +41,7 @@ export default class Sprite {
 
     update(lastSecondFPS) {
         this.spriteFPS = this.framesMax * this.framesCycle
-        this.framesHold = lastSecondFPS / this.spriteFPS; // = Math.round(lastSecondFPS / this.spriteFPS);
+        this.framesHold = lastSecondFPS / this.spriteFPS;
     }
 
     draw(interp) {
