@@ -1,12 +1,13 @@
 import Sprite from './Sprite.js';
 
-const gravity = 0.7; //0.7 without timestep sensitivity
+const gravity = 0.042; //0.042; with /(1000/60) || 0.7 without timestep sensitivity
+const groundHeight = 97;
 
 export default class Player extends Sprite {
 
     constructor(
         name = 'anonymous player',
-        {canvas, context, domHealthBar}, keys,
+        {canvas, context}, keys,
         {
             position,
             controls,
@@ -21,7 +22,6 @@ export default class Player extends Sprite {
     ) {
         super(name, {canvas, context}, { position, imageSrc, scale, framesMax, framesMax, offSet, mirrored });
         
-        this.domHealthBar = domHealthBar;
         this.keys = keys;
 
         this.velocity = {x: 0, y: 0};
@@ -36,8 +36,8 @@ export default class Player extends Sprite {
         this.health = 100;
         this.height = 150;
         this.width = 50;
-        this.xVelocity = 5; //Run speed (5 without timestep sensitivity)
-        this.yVelocity = -20; //Jump height (-20 without timestep sensitivity)
+        this.xVelocity = 0.3; //Run speed (0.3; with /(1000/60) || 5 without timestep sensitivity)
+        this.yVelocity = -1.2 //Jump height (-1.2; with /(1000/60) || -20 without timestep sensitivity)
         this.strength = 10;
         this.attackBox = {
             position: {
@@ -66,25 +66,27 @@ export default class Player extends Sprite {
     update(lastSecondFPS) {
         super.update(lastSecondFPS);
 
-        this.lastPosition = this.position;
+        //this.lastPosition = this.position;
 
-        this.updateHorizontalPosition();
+        let currentTimestep = 1000 / lastSecondFPS;
 
-        this.updateVerticalPosition();
+        this.updateHorizontalPosition(currentTimestep);
+
+        this.updateVerticalPosition(currentTimestep);
 
         if (this.isAttacking) {
-            this.updateAttackPosition();
+            this.updateAttackPosition(currentTimestep);
         }
     }
 
-    updateVerticalPosition() {
+    updateVerticalPosition(currentTimestep) {
         this.position.y += this.velocity.y;
 
         if(this.isOnGround(this)) {
             this.velocity.y = 0;
             this.position.y = 330;
         } else {
-            this.velocity.y += gravity;
+            this.velocity.y += gravity * currentTimestep;
             
             if (this.velocity.y < 0) {
                 this.switchSprites('jump');
@@ -94,8 +96,8 @@ export default class Player extends Sprite {
         }
     }
 
-    updateHorizontalPosition() {
-        const fpsRelativVelocity = this.xVelocity;
+    updateHorizontalPosition(currentTimestep) {
+        const fpsRelativVelocity = this.xVelocity * currentTimestep;
         let tempXPosition = this.position.x;
 
         if (this.keys[this.controls.left].pressed && this.lastDirection === this.controls.left) {
@@ -125,7 +127,7 @@ export default class Player extends Sprite {
         this.velocity.x = 0;
     }
 
-    updateAttackPosition() {
+    updateAttackPosition(currentTimestep) {
         this.attackBox.position.x = (!this.mirrored) ? (this.position.x + this.attackBox.offSet.x) : (this.position.x - this.attackBox.width + this.width - this.attackBox.offSet.x);
         this.attackBox.position.y = this.position.y + this.attackBox.offSet.y;
     }
@@ -137,9 +139,9 @@ export default class Player extends Sprite {
         }
     }
 
-    jump() {
+    jump(lastSecondFPS) {
         if(this.isOnGround(this)) {
-            this.velocity.y = this.yVelocity;
+            this.velocity.y = this.yVelocity * 1000 / lastSecondFPS;
         }
     }
 
@@ -223,7 +225,7 @@ export default class Player extends Sprite {
     }
 
     isOnGround(player) {
-        return this.position.y + this.height + this.velocity.y >= this.canvas.height - 97;
+        return this.position.y + this.height >= this.canvas.height - groundHeight;
     }
 
     takeHit(enemyStrength) {

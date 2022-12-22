@@ -1,11 +1,9 @@
 import Sprite from './Entity/Sprite.js';
 import Player from './Entity/Player.js';
+import Utils from './Utils.js';
 
 //DOM ELEMENTS
-let canvas;
-let fpsDisplay;
-let player1Health;
-let player2Health;
+let DOM;
 //CONTEXT ELEMENTS
 let context;
 //FRAME OBJECTS
@@ -13,7 +11,7 @@ let cancelAnimationFrame;
 let requestAnimationFrame;
 let frameID;
 //SETTIGS
-let settings;
+let SETTINGS;
 let keys;
 //ENTITIES
 let players;
@@ -34,35 +32,36 @@ let intervalCleared;
 
 /* PROGRAM FUNCTIONS **************************************************************************************************************************************** */
 
-function bindDomElements() {
-    fpsDisplay = document.getElementById('fpsDisplay');
-    canvas = document.querySelector('canvas');
-
-    player1Health = document.getElementById('player1Health');
-    player2Health = document.getElementById('player2Health');
+function setDomElements() {
+    DOM = {
+        fpsDisplay: document.getElementById('fpsDisplay'),
+        canvas: document.querySelector('canvas'),
+        player1Health: document.getElementById('player1Health'),
+        player2Health: document.getElementById('player2Health')
+    }
 }
 
 function initSettings() {
-    settings = {
-        maxFPS: 10,
+    SETTINGS = {
+        maxFPS: 15,
         showFPS: true,
     }
 }
 
 function setSettings({ maxFPS, showFPS }) {
-    settings.maxFPS = maxFPS;
-    settings.showFPS = showFPS;
+    SETTINGS.maxFPS = maxFPS;
+    SETTINGS.showFPS = showFPS;
 }
 
 function setScenery() {
     scenery = [
-        new Sprite('background', {canvas, context}, {
+        new Sprite('background', { canvas: DOM.canvas, context }, {
             position: {x: 0, y: 0 },
             imageSrc: './assets/img/background.png',
             framesMax: 1,
             framesCycle: 1
         }),
-        new Sprite('shop', {canvas, context}, {
+        new Sprite('shop', { canvas: DOM.canvas, context }, {
             position: {x: 600, y: 128 },
             imageSrc: './assets/img/shop.png',
             scale: 2.75,
@@ -74,9 +73,9 @@ function setScenery() {
 
 function setPlayers() {
     players = [
-        new Player('player1', {canvas, context, player1Health}, keys, {
+        new Player('player1', { canvas: DOM.canvas, context }, keys, {
             position: {x: 50, y: 100},
-            controls: {left: "q", right: "d"},
+            controls: {left: "q", right: "d", jump: "z", attack: "x"},
             scale: 2.5,
             offSet: {x: 215, y: 155},
             sprites: {
@@ -117,9 +116,9 @@ function setPlayers() {
                 }
             }
         }),
-        new Player('player2', {canvas, context, player2Health}, keys, {
+        new Player('player2', { canvas: DOM.canvas, context }, keys, {
             position: {x: 924, y: 100},
-            controls: {left: "k", right: "m"},
+            controls: {left: "k", right: "m", jump: "o", attack: ":"},
             scale: 2.5,
             offSet: { x: 215, y: 170 },
             mirrored: true,
@@ -231,12 +230,9 @@ function initKeys() {
     }
 }
 
-function setKeys() {
+/* set an action to a key */
+function setKey(keyCode, action) {
 
-}
-
-function renderFPS(timeStamp) {
-    fpsDisplay.textContent = Math.round(currentFPS) + ' FPS';
 }
 
 function update() {
@@ -247,7 +243,7 @@ function update() {
     players.forEach((currentPlayer) => {
         currentPlayer.update(currentFPS);
 
-        let currentEnemy = players.find(p => p != currentPlayer)[0];
+        let currentEnemy = players.find(p => p != currentPlayer);
 
         if (currentPlayer.isHited && currentPlayer.frameCurrent == currentPlayer.framesMax - 1) {
             currentPlayer.isHited = false;
@@ -258,11 +254,11 @@ function update() {
         } else if (
             currentPlayer.isAttacking
             && currentPlayer.frameCurrent > 3
-            && rectangularCollision({entity1: currentPlayer, entity2: currentEnemy})
+            && Utils.rectangularCollision({e1: currentPlayer.attackBox, e2: currentEnemy})
             && !currentEnemy.isHited
         ) {
             currentEnemy.takeHit(10);
-            currentEnemy.domHealthBar.style.width = currentEnemy.health + "%";
+            updateHealthBars();
             checkWin();
         }
     });
@@ -284,7 +280,6 @@ function panic() {
 }
 
 function begin() { //before update
-    /*
     scenery.forEach((sceneElement) => {
         sceneElement.begin();
     });
@@ -292,7 +287,6 @@ function begin() { //before update
     players.forEach((currentPlayer) => {
         currentPlayer.begin();
     });
-    */
 }
 
 function end() { //after rendering
@@ -305,9 +299,14 @@ function end() { //after rendering
     });
 }
 
+function updateHealthBars() {
+    DOM.player1Health.style.width = players[0].health + "%";
+    DOM.player2Health.style.width = players[1].health + "%";
+}
+
 function mainLoop(timestamp) {        
     // Throttle the frame rate. (return untill it's time to loop, depending on asked FPS)
-    if (timestamp < lastFrameTimeMs + (1000 / settings.maxFPS)) {
+    if (timestamp < lastFrameTimeMs + (1000 / SETTINGS.maxFPS)) {
         requestAnimationFrame(mainLoop);
         return;
     }
@@ -331,7 +330,7 @@ function mainLoop(timestamp) {
 
     draw(delta / timestep);
 
-    if (settings.showFPS) {
+    if (SETTINGS.showFPS) {
         renderFPS(currentFPS);
     }
 
@@ -423,11 +422,11 @@ function keyDownListener(event) {
             break;
         case 'z':
             keys["z"].pressed = true;
-            players[0].jump();
+            players[0].jump(currentFPS);
             break;
         case 'x':
             keys["x"].pressed = true;
-            player1.attack();
+            players[0].attack();
             break;
 
         case 'k':
@@ -440,11 +439,11 @@ function keyDownListener(event) {
             break;
         case 'o':
             keys["o"].pressed = true;
-            players[1].jump();
+            players[1].jump(currentFPS);
             break;
         case ':':
             keys[":"].pressed = true;
-            player2.attack();
+            players[1].attack();
             break;
 
         case 'return':
@@ -545,7 +544,7 @@ function resetGame() {
 }
 
 function resetSettings() {
-    settings = {
+    SETTINGS = {
         maxFPS: 45,
         showFPS: false,
     }
@@ -553,33 +552,25 @@ function resetSettings() {
 
 /* UTILS ********************************************************************************************* */
 
-function rectangularCollision({entity1, entity2}) {
-    return (
-        entity1.attackBox.position.x + entity1.attackBox.width >= entity2.position.x
-        && entity1.attackBox.position.x <= entity2.position.x + entity2.width
-        && entity1.attackBox.position.y + entity1.attackBox.height >= entity2.position.y
-        && entity1.attackBox.position.y <= entity2.position.y + entity2.height
-    );
-}
-
-function roundedCollision({entity1, entity2}) {
-    //
+/* Affiche sur un élément du DOM les fps actuel */
+function renderFPS(timeStamp) {
+    DOM.fpsDisplay.textContent = Math.round(currentFPS) + ' FPS';
 }
 
 function init() {
 
     initSettings();
 
-    bindDomElements();
+    setDomElements();
 
     //setDomProperties();
-    canvas.width = 1024;
-    canvas.height = 576;
+    DOM.canvas.width = 1024;
+    DOM.canvas.height = 576;
 
-    context = canvas.getContext('2d');
+    context = DOM.canvas.getContext('2d');
 
-    currentFPS = settings.maxFPS;
-    timestep = 1000 / settings.maxFPS;
+    currentFPS = SETTINGS.maxFPS;
+    timestep = 1000 / SETTINGS.maxFPS;
 
     frameID = 0;
 
